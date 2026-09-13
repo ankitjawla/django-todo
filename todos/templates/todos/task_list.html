@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Todos</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 600px; margin: 2rem auto; padding: 0 1rem; }
+    h1 { margin-bottom: 1rem; }
+    form.add { display: flex; gap: .5rem; margin-bottom: 1.5rem; }
+    form.add input { flex: 1; padding: .5rem; font-size: 1rem; }
+    button { padding: .5rem .75rem; font-size: .9rem; cursor: pointer; }
+    ul { list-style: none; padding: 0; }
+    li { display: flex; align-items: center; gap: .5rem; padding: .5rem 0; border-bottom: 1px solid #eee; }
+    li .title { flex: 1; }
+    li.done .title { text-decoration: line-through; color: #888; }
+    li form { display: inline; }
+    .empty { color: #888; }
+  </style>
+</head>
+<body>
+  <h1>Todo List</h1>
+
+  <form class="add" method="post" action="{% url 'todos:task_list' %}">
+    {% csrf_token %}
+    <input type="text" name="title" placeholder="New task..." required autofocus>
+    <button type="submit">Add</button>
+  </form>
+
+  <ul>
+    {% for task in tasks %}
+      <li class="{% if task.completed %}done{% endif %}">
+        <span class="title">{{ task.title }}</span>
+        <form method="post" action="{% url 'todos:toggle_task' task.id %}">
+          {% csrf_token %}
+          <button type="submit">{% if task.completed %}Undo{% else %}Done{% endif %}</button>
+        </form>
+        <form method="post" action="{% url 'todos:delete_task' task.id %}">
+          {% csrf_token %}
+          <button type="submit">Delete</button>
+        </form>
+      </li>
+    {% empty %}
+      <li class="empty">No tasks yet. Add one above!</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>
